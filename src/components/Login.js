@@ -51,7 +51,7 @@ const Login = () => {
               setErrMsg(error);
             });
           // is user signs/loginsin we will redirect to browse
-          navigate("/browse");
+          //navigate("/browse");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -66,7 +66,7 @@ const Login = () => {
       )
         .then((userCredential) => {
           // Signed in
-          navigate("/browse");
+          //navigate("/browse");
         })
         .catch((error) => {
           const errorCode = error.code;

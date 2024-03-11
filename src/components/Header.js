@@ -1,19 +1,60 @@
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { signOut } from "firebase/auth";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
-import { removeUser } from "../utils/userSlice";
+import { addUser, removeUser } from "../utils/userSlice";
+import { LOGO } from "../utils/constants";
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+
+  //setting up the event listener only once
+
+  useEffect(() => {
+    /*
+      When you first attach a listener using onAuthStateChanged, Firebase immediately invokes your callback function 
+      with the initial authentication state of the user, if they are already signed in/not signed in .Whenever 
+      the authentication state of the user changes, Firebase automatically calls your onAuthStateChanged callback function again.
+
+      In Firebase, onAuthStateChanged is a listener function that is called whenever the authentication  state 
+      changes. This function is typically   used in Firebase Authentication to monitor whether a user is 
+      signed in or signed out.
+   */
+
+    /*
+      instaed of calling the dispatch function in login.js file at createuser and signin user fns,we are using
+      the onAuthStateChanged and dispatching the actions.Ex.If user signsin.signsout onauth..fn is triggered 
+      and if user details are there we are adding user details to store,else we call remove user fn
+   */
+
+    /*
+      using this if user access browse page,if he is signed in he can access browse page ,
+      If not signed in will be redirected to login page
+    */
+    let unsubscribe = onAuthStateChanged(auth, (user) => {
+      //if user is signed in
+      if (user) {
+        const { displayName, email, uid, photoURL } = user;
+        dispatch(addUser({ displayName, email, photoURL, uid }));
+        navigate("/browse");
+      } else {
+        // User is signed out
+        dispatch(removeUser());
+        navigate("/");
+      }
+    });
+    //unsubscribing to onauthstate change method when component is unmounted
+    return () => unsubscribe();
+  }, []);
+
   const handleSignOut = () => {
     signOut(auth)
       .then(() => {
         // Sign-out successful.
         //updating store after user signout
         dispatch(removeUser());
-        navigate("/");
       })
       .catch((error) => {
         // An error happened.
@@ -21,22 +62,14 @@ const Header = () => {
       });
   };
   return (
-    <div className="w-screen absolute z-40 p-2 bg-gradient-to-b from-black flex justify-between">
+    <div className="max-w-full w-screen absolute z-40 p-2 bg-gradient-to-b from-black flex justify-between">
       <div>
-        <img
-          className="w-60"
-          src="https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
-          alt="logo"
-        />
+        <img className="w-60" src={LOGO} alt="logo" />
       </div>
       {user && (
         <div className="flex">
-          <img
-            className="w-60"
-            alt="signout"
-            src="https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
-          />
-          <button className="text-white font-bold" onClick={handleSignOut}>
+          <img className="w-60" alt="signout" src={LOGO} />
+          <button className="text-white font-bold mr-7" onClick={handleSignOut}>
             Sign Out
           </button>
         </div>
