@@ -9,7 +9,7 @@ const MainContainer = () => {
   const { title, overview, id } = movieData?.nowPlayingMovies[9] || {};
   //console.log(movieData);
   return (
-    <div>
+    <div className="pt-[40%] sm:pt-[20%] bg-black md:pt-0">
       <VideoTitle title={title} overview={overview} />
       <VideoBackground movieId={id} />
     </div>

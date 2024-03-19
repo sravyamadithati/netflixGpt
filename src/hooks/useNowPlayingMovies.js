@@ -12,10 +12,9 @@ const useNowPlayingMovies = () => {
         GETMOVIESOPTIONS
       );
       const jsondata = await data.json();
-      console.log(jsondata, jsondata.results);
       dispatch(addNowPlayingMovies(jsondata.results));
     };
     getMovies();
-  }, []);
+  }, [dispatch]);
 };
 export default useNowPlayingMovies;

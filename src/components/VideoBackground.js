@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 const VideoBackground = ({ movieId }) => {
   const dispatch = useDispatch();
   const videoData = useSelector((state) => state.movies);
-  console.log(videoData);
   useEffect(() => {
     const getVideoData = async () => {
       const data = await fetch(
@@ -14,7 +13,6 @@ const VideoBackground = ({ movieId }) => {
         GETMOVIESOPTIONS
       );
       const json = await data.json();
-      console.log(data, json);
       const filterData = json?.results.filter(
         (data) => data.type === "Trailer"
       );
@@ -23,9 +21,10 @@ const VideoBackground = ({ movieId }) => {
     getVideoData();
   }, [dispatch, movieId]);
   return (
-    <div className=" bg-gradient-to-r from-black w-f">
+    //we are adding gradient background here,so that title and name will be clearly visible on top of video
+    <div className=" bg-gradient-to-r from-black pb-3 md:pb-0">
       <iframe
-        class="w-full aspect-video"
+        className="w-full aspect-video"
         src={
           "https://www.youtube.com/embed/" +
           videoData.trailerVideo?.key +

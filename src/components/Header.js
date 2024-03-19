@@ -4,11 +4,13 @@ import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { addUser, removeUser } from "../utils/userSlice";
-import { LOGO } from "../utils/constants";
+import { toggleGptSearchView } from "../utils/gptSlice";
+import { LOGO, signOutImg } from "../utils/constants";
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const gptData = useSelector((state) => state.gpt.gptSearchView);
 
   //setting up the event listener only once
 
@@ -61,14 +63,32 @@ const Header = () => {
         navigate("/error");
       });
   };
+
+  const handleGptSearchView = () => {
+    dispatch(toggleGptSearchView());
+  };
   return (
-    <div className="max-w-full w-screen absolute z-40 p-2 bg-gradient-to-b from-black flex justify-between">
+    <div className="max-w-full w-screen absolute z-40 p-2 bg-gradient-to-b from-black flex flex-col md:flex-row md:justify-between">
       <div>
-        <img className="w-60" src={LOGO} alt="logo" />
+        <img
+          className="w-[200px] md:w-[300px] mx-auto md:m-0"
+          src={LOGO}
+          alt="logo"
+        />
       </div>
       {user && (
-        <div className="flex">
-          <img className="w-60" alt="signout" src={LOGO} />
+        <div className="flex justify-center">
+          <button
+            className="bg-gray-700 text-white h-14 my-2 md:my-6 px-3  rounded-lg"
+            onClick={handleGptSearchView}
+          >
+            {!gptData ? "GPT Search" : "Go To Home"}
+          </button>
+          <img
+            className=" w-[55px] h-12 mt-3 md:mt-6 pl-3"
+            alt="signout"
+            src={signOutImg}
+          />
           <button className="text-white font-bold mr-7" onClick={handleSignOut}>
             Sign Out
           </button>

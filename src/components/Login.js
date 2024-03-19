@@ -10,6 +10,7 @@ import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import { BG_LOGO } from "../utils/constants";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -80,13 +81,14 @@ const Login = () => {
       <Header />
       <div className="w-screen">
         <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/2e07bc25-8b8f-4531-8e1f-7e5e33938793/e4b3c14a-684b-4fc4-b14f-2b486a4e9f4e/IN-en-20240219-popsignuptwoweeks-perspective_alpha_website_large.jpg"
+          src={BG_LOGO}
           alt="movies"
+          className="w-screen h-screen object-cover"
         />
       </div>
       <form
         onSubmit={(e) => e.preventDefault()}
-        className="py-7 px-12 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white w-3/12 bg-black bg-opacity-70"
+        className="py-7 px-12 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white w-full sm:6/12 md:w-3/12 bg-black bg-opacity-70"
       >
         <h1 className="text-3xl font-bold mb-7">
           {isSignInForm ? "Sign In" : "Sign Up"}
