@@ -3,6 +3,14 @@ import MovieList from "./MovieList";
 
 const GptMovieSuggestions = () => {
   const data = useSelector((state) => state.gpt);
+  if (data.error) {
+    return (
+      <div className="text-white">
+        An error occured while fetching movies data.Please try after some time
+        or try switching to other networks if you are using jio
+      </div>
+    );
+  }
   if (!data?.tmdbMovies) {
     return;
     // return <ShimmerSimpleGallery card imageHeight={300} />;

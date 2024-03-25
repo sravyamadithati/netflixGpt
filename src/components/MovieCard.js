@@ -7,7 +7,7 @@ const MovieCard = ({ movie }) => {
   return (
     <div className="pr-6 md:max-w-64 max-w-56 h-72 md:h-80 hover:scale-110  transition duration-300 hover:-translate-y-1 ">
       <img
-        className="max-w-40 md:max-w-52 h-42 md:h-72 "
+        className="max-w-40 md:max-w-52 h-42 md:h-62 "
         alt="movie"
         src={IMG_CDN + movie?.poster_path}
       />

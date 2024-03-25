@@ -1,13 +1,14 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import openai from "../utils/openAI";
 import { BG_LOGO, GETMOVIESOPTIONS } from "../utils/constants";
-import { addGptMovieResults } from "../utils/gptSlice";
+import { addGptMovieResults, errorFetchingGPTMovies } from "../utils/gptSlice";
 import GptMovieSuggestions from "./GptMovieSuggestions";
 
 const GptSearch = () => {
   const searchTextRef = useRef();
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   //const gptmoviedata
 
   const searchMoviesInTMDB = async (movie) => {
@@ -20,20 +21,25 @@ const GptSearch = () => {
   };
 
   const handleGptSearch = async () => {
+    setIsLoading(true);
     const query =
       "Act as movie recommendation system and suggest movies for the query:" +
       searchTextRef.current.value +
       " only give me names of 5 movies with only comma seperated like the example result given ahead : Movie,Movie,Movie,Movie,Movie.Do not add numbers before movie name";
-
     const gptResult = await openai.chat.completions.create({
       messages: [{ role: "user", content: query }],
       model: "gpt-3.5-turbo",
     });
     const gptMovies = gptResult?.choices[0]?.message?.content.split(",");
-    const res = await Promise.all(
-      gptMovies?.map((movie) => searchMoviesInTMDB(movie))
-    );
-    dispatch(addGptMovieResults({ tmdbMovies: res, names: gptMovies }));
+    try {
+      const res = await Promise.all(
+        gptMovies?.map((movie) => searchMoviesInTMDB(movie))
+      );
+      setIsLoading(false);
+      dispatch(addGptMovieResults({ tmdbMovies: res, names: gptMovies }));
+    } catch (e) {
+      dispatch(errorFetchingGPTMovies());
+    }
   };
 
   return (
@@ -46,7 +52,7 @@ const GptSearch = () => {
         />
       </div>
       <div className="">
-        <div className="pt-[45%] md:pt-[10%]">
+        <div className="pt-[35%] md:pt-[10%]">
           <form
             onSubmit={(e) => e.preventDefault()}
             className="w-full  md:w-1/2 bg-black rounded-lg bg-opacity-80 m-auto grid grid-cols-12"
@@ -59,10 +65,14 @@ const GptSearch = () => {
               className=" bg-white p-4 m-3 col-span-9 rounded-lg"
             />
             <button
-              className="bg-red-500 p-3 m-2 rounded-lg col-span-3"
+              className="bg-red-600 p-3 m-2 rounded-lg col-span-3 text-white"
               onClick={handleGptSearch}
             >
-              Search
+              {isLoading ? (
+                <i className="fa fa-circle-o-notch fa-spin text-3xl "></i>
+              ) : (
+                "Search"
+              )}
             </button>
           </form>
         </div>

@@ -7,19 +7,17 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { BG_LOGO } from "../utils/constants";
 const Login = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errMsg, setErrMsg] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const email = useRef(null);
   const password = useRef(null);
   const userName = useRef(null);
-
   const toggleSignInForm = () => {
     setIsSignInForm((prev) => !prev);
   };
@@ -30,6 +28,7 @@ const Login = () => {
     );
     setErrMsg(message);
     if (message) return;
+    setIsLoading(true);
     if (!isSignInForm) {
       createUserWithEmailAndPassword(
         auth,
@@ -46,10 +45,12 @@ const Login = () => {
               // Profile updated!
               const { displayName, email, uid, photoURL } = auth.currentUser;
               dispatch(addUser({ displayName, email, photoURL, uid }));
+              setIsLoading(false);
             })
             .catch((error) => {
               // An error occurred
               setErrMsg(error);
+              setIsLoading(false);
             });
           // is user signs/loginsin we will redirect to browse
           //navigate("/browse");
@@ -66,6 +67,7 @@ const Login = () => {
         password.current.value
       )
         .then((userCredential) => {
+          setIsLoading(false);
           // Signed in
           //navigate("/browse");
         })
@@ -73,6 +75,7 @@ const Login = () => {
           const errorCode = error.code;
           const errorMessage = error.message;
           setErrMsg(errorCode + " " + errorMessage);
+          setIsLoading(false);
         });
     }
   };
@@ -117,12 +120,18 @@ const Login = () => {
           className="p-4 mb-4 w-full rounded-md bg-gray-700"
         />
         <button
-          className="bg-red-500 w-full rounded-md p-3 mb-4"
+          className="bg-red-600 w-full rounded-md p-3 mb-4 text-white"
           onClick={validateFormData}
         >
-          {isSignInForm ? "Sign In" : "Sign Up"}
+          {isLoading ? (
+            <i className="fa fa-circle-o-notch fa-spin text-3xl"></i>
+          ) : isSignInForm ? (
+            "Sign In"
+          ) : (
+            "Sign Up"
+          )}
         </button>
-        <p className="mb-3 font-medium text-red-500">{errMsg}</p>
+        <p className="mb-3 font-medium text-red-600">{errMsg}</p>
         <p onClick={toggleSignInForm} className="cursor-pointer">
           {isSignInForm
             ? "New to Netflix? Sign up now."

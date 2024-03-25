@@ -4,8 +4,9 @@ import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { addUser, removeUser } from "../utils/userSlice";
-import { toggleGptSearchView } from "../utils/gptSlice";
-import { LOGO, signOutImg } from "../utils/constants";
+import { resetGptResults, toggleGptSearchView } from "../utils/gptSlice";
+import { signOutImg } from "../utils/constants";
+import Sidebar from "./Sidebar";
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -49,7 +50,7 @@ const Header = () => {
     });
     //unsubscribing to onauthstate change method when component is unmounted
     return () => unsubscribe();
-  }, []);
+  }, [dispatch, navigate]);
 
   const handleSignOut = () => {
     signOut(auth)
@@ -57,6 +58,7 @@ const Header = () => {
         // Sign-out successful.
         //updating store after user signout
         dispatch(removeUser());
+        dispatch(resetGptResults());
       })
       .catch((error) => {
         // An error happened.
@@ -68,24 +70,22 @@ const Header = () => {
     dispatch(toggleGptSearchView());
   };
   return (
-    <div className="max-w-full w-screen absolute z-40 p-2 bg-gradient-to-b from-black flex flex-col md:flex-row md:justify-between">
-      <div>
-        <img
-          className="w-[200px] md:w-[300px] mx-auto md:m-0"
-          src={LOGO}
-          alt="logo"
-        />
-      </div>
+    <div className="max-w-full w-screen absolute z-3000 md:bg-gradient-to-b md:from-black flex flex-col md:flex-row md:justify-between">
+      <Sidebar
+        name={user?.displayName}
+        handleGptSearchView={handleGptSearchView}
+        handleSignOut={handleSignOut}
+      />
       {user && (
-        <div className="flex justify-center">
+        <div className="justify-center hidden md:flex ">
           <button
-            className="bg-gray-700 text-white h-14 my-2 md:my-6 px-3  rounded-lg"
+            className="bg-gray-700 text-white h-14 my-1 md:my-6 px-3  rounded-lg"
             onClick={handleGptSearchView}
           >
-            {!gptData ? "GPT Search" : "Go To Home"}
+            {!gptData ? "GPT Search" : "Home"}
           </button>
           <img
-            className=" w-[55px] h-12 mt-3 md:mt-6 pl-3"
+            className=" w-[55px] h-12 mt-2 md:mt-6 pl-3"
             alt="signout"
             src={signOutImg}
           />
